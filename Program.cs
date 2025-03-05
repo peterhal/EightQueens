@@ -7,6 +7,18 @@ class State {
         rowByColumn = new int[SIZE];
     }
 
+    private State(State other) {
+        this.d1 = other.d1;
+        this.d2 = other.d2;
+        this.column = other.column;
+        this.rows = other.rows;
+        this.rowByColumn = (int[]) other.rowByColumn.Clone();
+    }
+
+    public State Clone() {
+        return new State(this);
+    }
+
     public int Column { get { return column; } }
     public IEnumerable<int> Rows() {
         // TODO: use lookup table
@@ -108,27 +120,27 @@ class State {
     private ushort d2; // reversed other diagonal
 
     private static int undos = 0;
-    private static bool FindSolution(State state) {
+    private static IEnumerable<State> FindSolution(State state) {
         if (state.IsDone()) {
-            return true;
+            yield return state.Clone();
         }
 
         foreach (var row in state.Rows()) {
             state.SetRow(row);
-            if (FindSolution(state)) {
-                return true;
+
+            foreach (var result in FindSolution(state)) {
+                yield return result;
             }
             state.Undo();
             undos++;
         }
-
-        return false;
     }
 
     public static void Main() {
         var state = new State();
-        FindSolution(state);
-        Console.WriteLine(state.ToString());
-        Console.WriteLine(undos);
+        foreach (var result in FindSolution(state)) {
+            Console.WriteLine(result.ToString());
+            Console.WriteLine(undos);
+        }
     }
 }
