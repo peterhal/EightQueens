@@ -138,9 +138,12 @@ class State {
 
     public static void Main() {
         var state = new State();
+        var count = 0;
         foreach (var result in FindSolution(state)) {
             Console.WriteLine(result.ToString());
             Console.WriteLine(undos);
+            count++;
         }
+        Console.WriteLine(count);
     }
 }
